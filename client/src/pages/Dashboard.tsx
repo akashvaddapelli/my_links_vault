@@ -1,18 +1,20 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Search, LogOut } from "lucide-react";
+import { Search, LogOut, FileText, Link as LinkIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { useUser, useLogout } from "@/hooks/use-auth";
 import { useLinks } from "@/hooks/use-links";
 import { AddLinkModal } from "@/components/AddLinkModal";
 import { LinkCard } from "@/components/LinkCard";
+import type { Link } from "@shared/schema";
+
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
   const { data: user, isLoading: isUserLoading } = useUser();
   const { mutate: logout } = useLogout();
   const { data: links = [], isLoading: isLinksLoading } = useLinks();
-  
+
   const [searchQuery, setSearchQuery] = useState("");
 
   // Protect route
@@ -26,7 +28,7 @@ export default function Dashboard() {
     logout(undefined, { onSuccess: () => setLocation("/login") });
   };
 
-  const filteredLinks = links.filter((link) =>
+  const filteredLinks = links.filter((link: Link) =>
     link.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -37,13 +39,31 @@ export default function Dashboard() {
       {/* Navigation / Header Bar */}
       <nav className="border-b-2 border-black dark:border-white bg-white dark:bg-black sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-black dark:bg-white text-white dark:text-black flex items-center justify-center rounded-lg brutal-border shadow-brutal text-xl">
-              🔗
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-black dark:bg-white text-white dark:text-black flex items-center justify-center rounded-lg brutal-border shadow-brutal text-xl">
+                🔗
+              </div>
+              <span className="font-display font-bold text-xl hidden sm:block">LinkVault</span>
             </div>
-            <span className="font-display font-bold text-xl hidden sm:block">LinkVault</span>
+
+            <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl brutal-border">
+              <button
+                className="px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 bg-black text-white dark:bg-white dark:text-black shadow-sm"
+              >
+                <LinkIcon className="w-4 h-4" />
+                <span>Links</span>
+              </button>
+              <button
+                onClick={() => setLocation("/documents")}
+                className="px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all hover:bg-white dark:hover:bg-black"
+              >
+                <FileText className="w-4 h-4" />
+                <span>Documents</span>
+              </button>
+            </div>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <AddLinkModal />
             <button
@@ -57,9 +77,10 @@ export default function Dashboard() {
         </div>
       </nav>
 
+
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8 text-center sm:text-left"
@@ -73,7 +94,7 @@ export default function Dashboard() {
         </motion.div>
 
         {/* Search Bar */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -93,19 +114,19 @@ export default function Dashboard() {
 
         {/* Links Grid */}
         {isLinksLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="h-24 bg-gray-200 dark:bg-gray-800 rounded-2xl brutal-border animate-pulse" />
             ))}
           </div>
         ) : filteredLinks.length > 0 ? (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
             className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"
           >
-            {filteredLinks.map((link, index) => (
+            {filteredLinks.map((link: Link, index: number) => (
               <motion.div
                 key={link.id}
                 initial={{ opacity: 0, y: 20 }}

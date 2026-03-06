@@ -11,6 +11,23 @@ export const links = pgTable("links", {
   created_at: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const documents = pgTable("documents", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description"),
+  file_url: text("file_url").notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertDocumentSchema = createInsertSchema(documents).pick({
+  title: true,
+  description: true,
+  file_url: true,
+});
+
+export type Document = typeof documents.$inferSelect;
+export type InsertDocument = z.infer<typeof insertDocumentSchema>;
+
 export const insertLinkSchema = createInsertSchema(links).pick({
   title: true,
   url: true,
