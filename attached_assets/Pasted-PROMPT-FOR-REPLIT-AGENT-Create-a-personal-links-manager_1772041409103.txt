@@ -1,0 +1,118 @@
+PROMPT FOR REPLIT AGENT:
+Create a personal links manager web application with the following requirements:
+TECH STACK:
+
+React (Vite)
+Tailwind CSS
+Supabase for database
+react-icons for icons
+
+AUTHENTICATION:
+Create a login page (no signup). Hardcode these credentials:
+
+Email: munna.chillas@gmail.com
+Password: 9014094534.v
+
+Login page should be clean, centered, with email and password inputs and a black "Login" button. If credentials match, redirect to main page.
+MAIN PAGE DESIGN:
+Header:
+
+Bold large text: "Welcome back💖 Akash vaddapelli😎"
+Below it: "Your Links are safe and secured ...here!😊"
+Search bar (searches titles only)
+"Add Link" button (top right, black background, white text)
+
+ADD LINK FUNCTIONALITY:
+Form with only 3 fields:
+
+Title
+URL
+Description
+No validation needed. Just save to Supabase.
+
+LINKS DISPLAY:
+Show each link as a rectangle card with:
+
+Dynamic icon based on title keywords (instagram→Instagram icon, youtube→YouTube icon, github→GitHub icon, etc. Use react-icons)
+Title text on the card
+URL and description HIDDEN initially
+When clicked, show URL and description in a modal or expanded view
+
+Card styling:
+
+White background, black border
+Shadow effect
+Hover: lift up with stronger shadow
+Responsive grid: 1 column mobile, 2 tablet, 3-4 desktop
+
+SUPABASE DATABASE:
+Create a "links" table:
+
+id (uuid, primary key)
+user_email (text)
+title (text)
+url (text)
+description (text)
+created_at (timestamp)
+
+Store all links here so they persist across devices.
+COLOR SCHEME:
+
+Primary: White (#FFFFFF)
+Secondary: Black (#000000)
+Gray shades for subtle elements
+Black and white only, minimalist design
+
+FEATURES:
+
+Search links by title (real-time filter)
+Add new links
+Click card to view URL and description
+Responsive design
+Smooth animations and hover effects
+Data persists in Supabase
+
+NO NEED FOR:
+
+Signup
+Import/export
+Form validation
+Tags or filters
+Dashboard
+
+Build this as a clean, production-ready app with high responsiveness and smooth UX.
+
+STEPS TO USE IN REPLIT:
+
+Create new Repl:
+
+Click "Create Repl"
+Choose "React (Vite)" template
+Name it "links-manager"
+
+
+Start the AI Agent:
+
+Click the AI button in Replit
+Paste the prompt above
+Let it build the app
+
+
+Set up Supabase:
+
+Go to supabase.com and create free account
+Create new project
+Go to Table Editor → Create table "links" with columns mentioned
+Go to Settings → API → Copy your URL and anon key
+In Replit, create .env file and add:
+
+
+
+     VITE_SUPABASE_URL=your_supabase_url
+     VITE_SUPABASE_ANON_KEY=your_anon_key
+
+Run the app:
+
+Replit will auto-run or click "Run" button
+Test login with your credentials
+Start adding links!
