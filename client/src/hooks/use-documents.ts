@@ -2,12 +2,17 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { PDFDocument } from "pdf-lib";
 import { useToast } from "@/hooks/use-toast";
-import type { Document, InsertDocument } from "@shared/schema";
+import type { Document } from "@shared/schema";
+
+const SUPABASE_MISSING_MSG =
+    "Supabase is not configured. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your environment variables.";
 
 export function useDocuments() {
     return useQuery({
         queryKey: ["/api/documents"],
         queryFn: async () => {
+            if (!supabase) throw new Error(SUPABASE_MISSING_MSG);
+
             const { data, error } = await supabase
                 .from("documents")
                 .select("*")
@@ -16,6 +21,9 @@ export function useDocuments() {
             if (error) throw error;
             return data as Document[];
         },
+        // Don't auto-retry on Supabase config errors
+        retry: (failureCount, error: Error) =>
+            !error.message.includes("not configured") && failureCount < 2,
     });
 }
 
@@ -24,7 +32,17 @@ export function useUploadDocument() {
     const { toast } = useToast();
 
     return useMutation({
-        mutationFn: async ({ title, description, file }: { title: string; description: string; file: File }) => {
+        mutationFn: async ({
+            title,
+            description,
+            file,
+        }: {
+            title: string;
+            description: string;
+            file: File;
+        }) => {
+            if (!supabase) throw new Error(SUPABASE_MISSING_MSG);
+
             let pdfBytes: Uint8Array;
 
             if (file.type === "application/pdf") {
@@ -52,17 +70,15 @@ export function useUploadDocument() {
 
                 pdfBytes = await pdfDoc.save();
             } else {
-                // Fallback or handle other types if needed, but pdf-lib is limited
-                // For now, let's treat others as text or just error out
-                throw new Error("Unsupported file type. Please upload a PDF or an image.");
+                throw new Error("Unsupported file type. Please upload a PDF or an image (PNG/JPG).");
             }
 
-            const fileName = `${Date.now()}-${title.replace(/\s+/g, '-').toLowerCase()}.pdf`;
-            const { data: uploadData, error: uploadError } = await supabase.storage
+            const safeTitle = title.replace(/\s+/g, "-").toLowerCase();
+            const fileName = `${Date.now()}-${safeTitle}.pdf`;
+
+            const { error: uploadError } = await supabase.storage
                 .from("documents")
-                .upload(fileName, pdfBytes, {
-                    contentType: "application/pdf",
-                });
+                .upload(fileName, pdfBytes, { contentType: "application/pdf" });
 
             if (uploadError) throw uploadError;
 
@@ -88,7 +104,7 @@ export function useUploadDocument() {
                 description: "Your document has been converted to PDF and saved.",
             });
         },
-        onError: (error: any) => {
+        onError: (error: Error) => {
             toast({
                 variant: "destructive",
                 title: "Upload Failed",
@@ -97,3 +113,4 @@ export function useUploadDocument() {
         },
     });
 }
+
